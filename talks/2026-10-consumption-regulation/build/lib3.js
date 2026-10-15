@@ -231,6 +231,11 @@ async function finish(OUT, THEME, applyTheme) {
     out = out.replace(/<a:buSzPct val="100000"\/><a:buChar/g, `<a:buClr><a:srgbClr val="${COL.R}"/></a:buClr><a:buSzPct val="70000"/><a:buChar`);
     zip.file(name, out);
   }
+  // 待发布数据（null）在图表缓存中不写点，显示为空位
+  for (const name of Object.keys(zip.files).filter((n) => /^ppt\/charts\/chart\d+\.xml$/.test(n))) {
+    const x = await zip.file(name).async("string");
+    zip.file(name, x.replace(/<c:pt idx="\d+"><c:v><\/c:v><\/c:pt>/g, ""));
+  }
   fs.writeFileSync(OUT, await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }));
   return fixed;
 }

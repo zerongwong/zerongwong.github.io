@@ -126,7 +126,7 @@ module.exports = async function ({ L, D }) {
   }
   // B08 讲前更新清单
   {
-    const s = hid("B08 讲前更新清单", "按发布时间逐项更新data3.js后重新生成。");
+    const s = hid("B08 讲前更新清单", "标“预估”的数字在data3.js的q3中（est: true）；10月19日换成统计局发布值，把est改为false后重新生成。");
     table(s, [
       ["时间", "事项", "涉及页面"],
       ["10月19日（周一）10:00", "国家统计局前三季度GDP、1—9月社零与投资、前三季度居民收支、9月就业（以官网日程为准）", `${p("p_measure")}、${p("p_pull")}、${p("p_rs")}、${p("p_struct")}、${p("p_apc")}、${p("p_income")}、${p("p_jobs")}、${p("p_expect")}、${p("p_house")}、${p("p_evidence")}`],

@@ -1,40 +1,48 @@
 // 第三部分 内需之困（P14—P29，28分钟）＋ P30 休息
 module.exports = async function ({ L, D }) {
   const { pres, COL, W, MX, CW, T, paras, points, rect, hline, vline, arrow, src, take, subhead, kpi, stepBox, chain, table, co, chartCap, page } = L;
-  const yl = (a) => a.map((x) => x.replace("2026上半年", "2026\n上半年"));
+  const yl = (a) => a.map((x) => x.replace("2026上半年", "2026\n上半年").replace("2026前三季度", "2026\n前三季度"));
+  // 前三季度数据（10月19日发布）：null 显示为“××”
+  const Q = D.q3, QP = D.q3Prev, E = D.q3.est ? "（预估）" : "";
+  const last = (a, v) => [...a.slice(0, -1), v]; // 图表末项（2026年）取自 q3
+  const X = (v, d = 1, plus = false) => (v == null ? "××" : (plus && v > 0 ? "+" : "") + Number(v).toFixed(d));
+  const ph = (s, x, y, w, h, text) => {
+    s.addShape(pres.shapes.RECTANGLE, { x, y, w, h, fill: { color: "FAFAFA" }, line: { color: COL.GRAY_L, width: 1, dashType: "dash" } });
+    T(s, text, { x: x + 0.3, y, w: w - 0.6, h, fontSize: 16, color: COL.GRAY, align: "center", valign: "middle", lineSpacingMultiple: 1.3 });
+  };
 
   L.section("三 内需之困");
   // ---------- P14 消费在增长中的位置 ----------
   {
     const s = page(3, "消费仍是增长第一拉动力，但拉动力明显弱于疫情前", { opener: true, min: 1.5, key: "p_pull", notes:
-      "【时长】1.5分钟\n【讲法】回到国内。灰色柱是GDP增速，红色柱是最终消费拉动GDP的百分点。2019年消费拉动3.5个百分点，2025年2.6个，今年上半年2.1个。上半年GDP增长4.7%，其中消费拉动2.1、投资1.7、净出口0.8个百分点。消费贡献率约45%，去年同期是52%。\n消费仍是第一拉动力，但出力明显不如疫情前：上半年消费拉动不到一半，增长更多靠投资和净出口；这两年外需出力偏多。2025年中央经济工作会议的判断是“国内供强需弱矛盾突出”，今年7月统计局发布上半年数据时用的也是这个表述。\n【口径】最终消费包括居民和政府消费；拉动百分点不是贡献率，也不是GDP占比；上半年三项拉动相加4.6，与4.7有舍入尾差。\n【可能的追问】“资本形成拉动1.7个百分点，可1—8月固定资产投资却下降7.2%？”——两者口径不同：资本形成按支出法核算，包含存货变化，也不是固定资产投资那套统计范围，不能直接对比。\n【衔接】GDP回答总体作用。日常的商品和服务消费，还要分开看。\n【19日更新】统计局发布后只换数字。机构普遍预计三季度GDP增长4.4%—4.5%（中国银行研究院、华泰证券），前三季度约4.5%—4.6%。若前三季度消费贡献率升到50%以上，结论改为“消费贡献回到一半左右，但拉动力仍明显弱于疫情前”。\n【进度检查点】本页应在第20分钟左右开始。" });
-    chartCap(s, "GDP实际增速与最终消费拉动（百分点）", MX, 1.58, 7.7);
+      `【时长】1.5分钟\n【讲法】回到国内。灰色柱是GDP增速，红色柱是最终消费拉动GDP的百分点。2019年消费拉动3.5个百分点，2025年2.6个。今年前三季度GDP增长${X(Q.gdp)}%${E}，其中消费拉动${X(Q.pullC)}、投资${X(Q.pullI)}、净出口${X(Q.pullX)}个百分点；消费贡献率约${X(Q.shareC, 0)}%，去年同期是53.5%。\n消费仍是第一拉动力，但出力明显不如疫情前：今年消费贡献不到一半，增长更多靠投资和净出口；这两年外需出力偏多。2025年中央经济工作会议的判断是“国内供强需弱矛盾突出”，今年7月统计局发布上半年数据时用的也是这个表述。\n【口径】最终消费包括居民和政府消费；拉动百分点不是贡献率，也不是GDP占比；三项拉动相加可能与GDP增速有舍入尾差。\n【可能的追问】“资本形成在拉动GDP，可1—8月固定资产投资却下降7.2%？”——两者口径不同：资本形成按支出法核算，包含存货变化，也不是固定资产投资那套统计范围，不能直接对比。\n【衔接】GDP回答总体作用。日常的商品和服务消费，还要分开看。\n${Q.est ? "【预估说明】机构预计三季度GDP增长4.4%—4.5%（中国银行研究院、华泰证券），据此估前三季度约4.6%；三大需求的结构按上半年外推。上半年实际：GDP增长4.7%，消费拉动2.1、投资1.7、净出口0.8个百分点，消费贡献率约45%（去年同期52%）。19日换成发布值；若前三季度消费贡献率升到50%以上，结论改为“消费贡献回到一半左右，但拉动力仍明显弱于疫情前”。\n" : ""}【进度检查点】本页应在第20分钟左右开始。` });
+    chartCap(s, `GDP实际增速与最终消费拉动（百分点${Q.est ? "；2026年前三季度为预估值" : ""}）`, MX, 1.58, 7.7);
     s.addChart(pres.charts.BAR, [
-      { name: "GDP增速", labels: yl(D.gdpYears), values: D.gdpReal },
-      { name: "最终消费拉动", labels: yl(D.gdpYears), values: D.pullC },
+      { name: "GDP增速", labels: yl(D.gdpYears), values: last(D.gdpReal, Q.gdp) },
+      { name: "最终消费拉动", labels: yl(D.gdpYears), values: last(D.pullC, Q.pullC) },
     ], co({ x: MX, y: 1.95, w: 7.7, h: 4.05, barDir: "col", chartColors: [COL.GRAY_L, COL.R], showValue: true, dataLabelFormatCode: "0.0", showLegend: true, legendPos: "t", valAxisMinVal: -2, valAxisMaxVal: 10, valAxisMajorUnit: 2, valAxisHidden: true, valGridLine: { style: "none" }, barGapWidthPct: 45, catAxisLabelFontSize: 13, catAxisLabelPos: "low" }));
     const px = 8.65, pw = CW - (px - MX);
-    T(s, "2026年上半年：GDP增长4.7%", { x: px, y: 1.62, w: pw, h: 0.42, fontSize: 18, bold: true });
-    [["消费", "2.1", COL.R], ["投资", "1.7", COL.BLUE], ["净出口", "0.8", COL.GRAY]].forEach((k, i) => {
+    T(s, `2026年前三季度：GDP增长${X(Q.gdp)}%`, { x: px, y: 1.62, w: pw, h: 0.42, fontSize: 18, bold: true });
+    [["消费", X(Q.pullC), COL.R], ["投资", X(Q.pullI), COL.BLUE], ["净出口", X(Q.pullX), COL.GRAY]].forEach((k, i) => {
       const x = px + i * (pw / 3);
       T(s, k[1], { x, y: 2.1, w: pw / 3, h: 0.75, fontSize: 38, bold: true, color: k[2], align: "center", valign: "bottom" });
       T(s, k[0] + "拉动", { x, y: 2.88, w: pw / 3, h: 0.35, fontSize: 14, align: "center", color: COL.GRAY });
     });
     T(s, paras([
-      "消费贡献率约45%，去年同期为52%",
+      `消费贡献率约${X(Q.shareC, 0)}%${E}，去年同期为${QP.shareC}%`,
       "官方判断：“国内供强需弱矛盾突出”（2025年中央经济工作会议；统计局2026年7月）",
     ], { fontSize: 16, color: COL.INK }, { space: 10 }), { x: px, y: 3.45, w: pw, h: 2.5, lineSpacingMultiple: 1.1 });
     take(s, "消费拉动不到一半，增长更多靠**投资和净出口**——这正是“供强需弱”的含义。", { y: 6.12, h: 0.66, size: 18 });
-    src(s, "资料来源：国家统计局。最终消费含居民与政府消费；拉动百分点≠贡献率≠占比；上半年三项拉动相加有舍入尾差。");
+    src(s, "资料来源：国家统计局。最终消费含居民与政府消费；拉动百分点≠贡献率≠占比；三项拉动相加可能有舍入尾差。");
   }
 
   // ---------- P15 社零节奏 ----------
   {
     const s = page(3, "社零增速从去年5月的高点回落：高基数、补贴减弱与汽车拖累", { min: 2, key: "p_rs", notes:
-      "【时长】2分钟\n【讲法】左图是社零月度同比。去年5月6.4%是阶段高点，今年5月一度转负（-0.6%），是2022年12月以来首次负增长；8月0.4%。1—8月累计增长1.1%。\n要分清几件事：一是高基数——去年以旧换新力度大，抬高了基数；二是补贴力度减弱——今年以旧换新中央资金安排2500亿元，少于去年的3000亿元；家电补贴最高比例从20%降到15%，单件上限从2000元降到1500元，只补一级能效产品；三是需求前置——本来明后年才换的车和家电，提前到去年买了，今年自然回吐。汽车1—8月下降13.9%，扣除汽车，社零增长2.7%。\n剔除基数看两年平均增速：一季度约3.5%，7—8月约2%——基数解释了一部分，但动能确实在减弱。\n【口径】1—2月合并发布，不是单月；社零为名义值，不覆盖全部服务消费；同比受基数影响，不据单月推断全年。\n【衔接】金额的变化，还要结合价格看。" });
-    chartCap(s, "社会消费品零售总额月度同比（%）", MX, 1.58, 7.9);
+      `【时长】2分钟\n【讲法】左图是社零月度同比。去年5月6.4%是阶段高点，今年5月一度转负（-0.6%），是2022年12月以来首次负增长；9月${X(Q.rsSep)}%，1—9月累计增长${X(Q.rsYTD)}%${E}。\n要分清几件事：一是高基数——去年以旧换新力度大，抬高了基数；二是补贴力度减弱——今年以旧换新中央资金安排2500亿元，少于去年的3000亿元；家电补贴最高比例从20%降到15%，单件上限从2000元降到1500元，只补一级能效产品；三是需求前置——本来明后年才换的车和家电，提前到去年买了，今年自然回吐。汽车1—9月${X(Q.autoYTD, 1, true)}%，扣除汽车，社零增长${X(Q.exAutoYTD)}%。\n剔除基数看两年平均增速：一季度约3.5%，7—8月约2%——基数解释了一部分，但动能确实在减弱。\n${Q.est ? "【预估说明】9月按“两年平均增速保持7—8月的约2%”外推（去年9月基数3.0%），约1.0%；1—9月累计按1—8月走势外推。实际值：8月0.4%；1—8月累计1.1%，扣除汽车2.7%，汽车-13.9%。\n" : ""}【口径】1—2月合并发布，不是单月；社零为名义值，不覆盖全部服务消费；同比受基数影响，不据单月推断全年。\n【衔接】金额的变化，还要结合价格看。` });
+    chartCap(s, `社会消费品零售总额月度同比（%${Q.est ? "；2026年9月为预估值" : ""}）`, MX, 1.58, 7.9);
     const rsLab = D.rsLabels.map((x) => (x.includes("1-2") ? "1-2" : x));
-    s.addChart(pres.charts.LINE, [{ name: "社零同比", labels: rsLab, values: D.rs }], co({
+    s.addChart(pres.charts.LINE, [{ name: "社零同比", labels: rsLab, values: last(D.rs, Q.rsSep) }], co({
       x: MX, y: 1.95, w: 7.9, h: 4.0, chartColors: [COL.R], lineSize: 2.5, lineDataSymbol: "circle", lineDataSymbolSize: 7, showValue: true, dataLabelFormatCode: "0.0", dataLabelPosition: "t", dataLabelFontSize: 11,
       valAxisMinVal: -2, valAxisMaxVal: 8, valAxisMajorUnit: 2, catAxisLabelFontSize: 12, catAxisLabelPos: "low",
     }));
@@ -47,8 +55,8 @@ module.exports = async function ({ L, D }) {
       valAxisHidden: true, valGridLine: { style: "none" }, catAxisLabelFontSize: 11, valAxisMinVal: -6, valAxisMaxVal: 15, catAxisLabelPos: "low", barGapWidthPct: 35,
     }));
     T(s, paras([
-      "1—8月社零 **+1.1%**；扣除汽车 **+2.7%**",
-      "汽车 **-13.9%**",
+      `1—9月社零 **${X(Q.rsYTD, 1, true)}%**${E}`,
+      `扣除汽车 **${X(Q.exAutoYTD, 1, true)}%**；汽车 **${X(Q.autoYTD, 1, true)}%**`,
       "两年平均：一季度约**3.5%**，7—8月约**2%**",
     ], { fontSize: 17, color: COL.INK }, { space: 6 }), { x: px, y: 4.3, w: pw, h: 1.6, lineSpacingMultiple: 1.1 });
     take(s, "有基数和补贴节奏的因素，也有**耐用品“需求前置”后的回吐**：不全是需求塌陷，但动能确实在减弱。", { y: 6.12, h: 0.66, size: 18 });
@@ -86,23 +94,26 @@ module.exports = async function ({ L, D }) {
   // ---------- P17 结构 ----------
   {
     const s = page(3, "商品消费分化：通讯器材增长，汽车和住房相关品类下降", { min: 1.5, key: "p_struct", notes:
-      "【时长】1.5分钟\n【讲法】8月限额以上单位的分类数据：通讯器材增长27.3%，可能有新机型和存储芯片涨价的因素；烟酒、化妆品、药品也在增长。另一头，汽车下降18.5%，金银珠宝下降17.5%（可能与金价高企有关），建材下降11.8%、家具下降7.9%——这些和住房调整直接相关。\n1—8月，服务零售增长4.9%，快于商品零售的1.0%；餐饮收入增长2.4%，但限额以上餐饮8月下降0.7%。\n分化有三个来源，不能只用一个原因解释：一是补贴节奏，汽车是去年补贴集中释放后的回吐，数码产品仍在补贴范围内；二是住房调整，拖累家具、建材；三是收入预期，大额支出更谨慎。还要看到，消费偏弱是普遍的：上半年居民教育文化娱乐支出增速从去年同期的11.8%降到4.9%，服务也在放缓。\n【口径】分类为限额以上单位；服务零售与餐饮有交叉，不能相加；增速高不等于贡献大。\n【衔接】这是卖方的数据。家庭自己的账本是什么样？" });
-    chartCap(s, "2026年8月限额以上单位商品零售额同比（%）", MX, 1.58, 7.6);
-    const lab = D.augCats.map((r) => r[0]), val = D.augCats.map((r) => r[1]);
-    s.addChart(pres.charts.BAR, [{ name: "8月同比", labels: lab, values: val }], co({
+      "【时长】1.5分钟\n【讲法】9月限额以上单位的分类数据19日发布（图中暂按8月实际值），讲法按下面的结构。8月实际：通讯器材增长27.3%，可能有新机型和存储芯片涨价的因素；烟酒、化妆品、药品也在增长。另一头，汽车下降18.5%，金银珠宝下降17.5%（可能与金价高企有关），建材下降11.8%、家具下降7.9%——这些和住房调整直接相关。\n右表是1—9月累计（预估，按1—8月走势外推）。1—8月实际：服务零售增长4.9%，快于商品零售的1.0%；餐饮收入增长2.4%，但限额以上餐饮8月下降0.7%。\n分化有三个来源，不能只用一个原因解释：一是补贴节奏，汽车是去年补贴集中释放后的回吐，数码产品仍在补贴范围内；二是住房调整，拖累家具、建材；三是收入预期，大额支出更谨慎。还要看到，消费偏弱是普遍的：上半年居民教育文化娱乐支出增速从去年同期的11.8%降到4.9%，服务也在放缓。\n【口径】分类为限额以上单位；服务零售与餐饮有交叉，不能相加；增速高不等于贡献大。\n【衔接】这是卖方的数据。家庭自己的账本是什么样？" });
+    chartCap(s, `2026年9月限额以上单位商品零售额同比（%${Q.est ? "；预估：暂按8月实际值" : ""}）`, MX, 1.58, 7.6);
+    if (!Q.sepCats) ph(s, MX, 1.95, 7.6, 4.05, "9月分类数据10月19日发布后填入⏎重点看：通讯器材、家电音像、汽车、⏎家具、建筑及装潢材料、金银珠宝");
+    else {
+    const lab = Q.sepCats.map((r) => r[0]), val = Q.sepCats.map((r) => r[1]);
+    s.addChart(pres.charts.BAR, [{ name: "9月同比", labels: lab, values: val }], co({
       x: MX, y: 1.95, w: 7.6, h: 4.05, barDir: "bar", chartColors: val.map((v) => (v >= 0 ? COL.BLUE : COL.R)), showValue: true, dataLabelFormatCode: "0.0", dataLabelFontSize: 12,
       valAxisMinVal: -25, valAxisMaxVal: 35, valAxisHidden: true, valGridLine: { style: "none" }, catAxisOrientation: "maxMin", catAxisLabelPos: "low", catAxisLabelFontSize: 13, barGapWidthPct: 35,
     }));
+    }
     const px = 8.55, pw = CW - (px - MX);
-    T(s, "1—8月累计同比", { x: px, y: 1.6, w: pw, h: 0.4, fontSize: 18, bold: true });
+    T(s, "1—9月累计同比" + E, { x: px, y: 1.6, w: pw, h: 0.4, fontSize: 18, bold: true });
     table(s, [
       ["类别", "同比"],
-      ["服务零售额", "+4.9%"],
-      ["餐饮收入", "+2.4%"],
-      ["商品零售", "+1.0%"],
-      ["网上商品零售", "+4.3%"],
+      ["服务零售额", X(Q.svcRetailYTD, 1, true) + "%"],
+      ["餐饮收入", X(Q.cateringYTD, 1, true) + "%"],
+      ["商品零售", X(Q.goodsYTD, 1, true) + "%"],
+      ["网上商品零售", X(Q.onlineYTD, 1, true) + "%"],
     ], { x: px, y: 2.05, w: pw, colW: [pw * 0.62, pw * 0.38], rowH: 0.44, size: 16, align: ["left", "right"] });
-    T(s, "网上商品零售额占社零约25.7%", { x: px, y: 4.4, w: pw, h: 0.4, fontSize: 14, color: COL.GRAY });
+    T(s, `网上商品零售额占社零约${X(Q.onlineShare)}%`, { x: px, y: 4.4, w: pw, h: 0.4, fontSize: 14, color: COL.GRAY });
     take(s, "分化有三个来源：**补贴节奏**（汽车回吐、数码仍受补贴）、**住房调整**（家具、建材）、**收入预期**（大额更谨慎）。", { y: 6.12, h: 0.66, size: 17 });
     src(s, "资料来源：国家统计局、商务部。分类为限额以上单位；服务零售与餐饮口径有交叉，不能相加。");
   }
@@ -110,7 +121,7 @@ module.exports = async function ({ L, D }) {
   // ---------- P18 消费倾向 ----------
   {
     const s = page(3, "居民收入在增长，花钱的比例却还没回到疫情前", { min: 1.5, key: "p_apc", notes:
-      "【时长】1.5分钟\n【讲法】看家庭自己的账本——住户调查。左图是平均消费倾向，也就是每100元可支配收入里花掉多少：2019年70.1元，2020年掉到65.9元，之后在66.5—68.6元之间波动，没有回到疫情前。今年上半年收入名义增长5.2%，消费增长3.7%，消费慢于收入；上半年消费倾向64.6%，低于去年同期的65.5%。\n右图是服务性消费占比，已回到46%左右，说明支出结构在向服务转移。但上半年教育文化娱乐支出增速从去年同期的11.8%降到4.9%，交通通信从8.4%降到4.7%。\n粗算一下这个差距的分量：按2025年人均可支配收入43377元、约14亿人计算，消费倾向每回升1个百分点，大约对应6000亿元居民消费。\n【口径】平均消费倾向不是边际消费倾向；上半年数据有季节性，只与上年同期比较。\n【衔接】支出从哪里来？首先要看收入，以及收入在不同人之间的分布。" });
+      `【时长】1.5分钟\n【讲法】看家庭自己的账本——住户调查。左图是平均消费倾向，也就是每100元可支配收入里花掉多少：2019年70.1元，2020年掉到65.9元，之后在66.5—68.6元之间波动，没有回到疫情前。今年前三季度收入名义增长${X(Q.incG)}%，消费增长${X(Q.conG)}%；消费倾向${Q.inc && Q.con ? (Q.con / Q.inc * 100).toFixed(1) : "××"}%，去年同期是66.4%${E}。\n右图是服务性消费占比，已回到46%左右，说明支出结构在向服务转移。但上半年教育文化娱乐支出增速从去年同期的11.8%降到4.9%，交通通信从8.4%降到4.7%。\n粗算一下这个差距的分量：按2025年人均可支配收入43377元、约14亿人计算，消费倾向每回升1个百分点，大约对应6000亿元居民消费。\n${Q.est ? "【预估说明】前三季度收入和消费增速按上半年外推。上半年实际：收入名义增长5.2%，消费增长3.7%，消费慢于收入；消费倾向64.6%，低于去年同期的65.5%。\n" : ""}【口径】平均消费倾向不是边际消费倾向；季度数据有季节性，只与上年同期比较。\n【衔接】支出从哪里来？首先要看收入，以及收入在不同人之间的分布。` });
     const cw = (CW - 0.5) / 2;
     chartCap(s, "平均消费倾向（人均消费支出÷人均可支配收入，%）", MX, 1.58, cw);
     s.addChart(pres.charts.LINE, [{ name: "平均消费倾向", labels: D.apcYears, values: D.apc }], co({
@@ -123,7 +134,7 @@ module.exports = async function ({ L, D }) {
       x: x2, y: 1.95, w: cw, h: 3.4, barDir: "col", chartColors: [COL.BLUE], showValue: true, dataLabelFormatCode: "0.0",
       valAxisMinVal: 30, valAxisMaxVal: 50, valAxisHidden: true, valGridLine: { style: "none" }, barGapWidthPct: 45,
     }));
-    T(s, "2026年上半年：收入名义增长5.2%，消费增长3.7%；消费倾向64.6%，低于上年同期的65.5%", { x: MX, y: 5.42, w: CW, h: 0.45, fontSize: 16, color: COL.INK, valign: "middle" });
+    T(s, `2026年前三季度${E}：收入名义增长${X(Q.incG)}%，消费增长${X(Q.conG)}%；消费倾向${Q.inc && Q.con ? (Q.con / Q.inc * 100).toFixed(1) : "××"}%，上年同期为${QP.apc}%`, { x: MX, y: 5.42, w: CW, h: 0.45, fontSize: 16, color: COL.INK, valign: "middle" });
     take(s, "**挣得慢了，花得也少了**：按2025年数据粗算，消费倾向每回升1个百分点，约对应**6000亿元**居民消费。", { y: 6.12, h: 0.66, size: 18 });
     src(s, "资料来源：国家统计局住户调查；平均消费倾向与6000亿元为作者计算。");
   }
@@ -131,22 +142,23 @@ module.exports = async function ({ L, D }) {
   // ---------- P19 收入分布 ----------
   {
     const s = page(3, "看收入要看中位数：多数家庭的收入低于平均数", { min: 2, key: "p_income", notes:
-      "【时长】2分钟\n【讲法】平均数会“被拉高”。上半年全国居民人均可支配收入22981元，中位数19036元，只有平均数的83%——一半以上的人达不到平均数。中位数名义增长4.7%，也低于平均数的5.2%。\n右图对比收入和GDP的实际增速。2019年以来大体同步，但今年上半年居民收入实际增长4.2%，低于GDP的4.7%。上半年财产净收入只增长1.1%，资产端没有给家庭“加分”。农村居民收入增长6.4%，快于城镇的4.4%。\n所以“数据在增长、感觉没增长”有它的道理：多数家庭的感受，取决于中位数，和自己那份收入稳不稳。\n【19日更新】若前三季度居民收入实际增速不低于GDP，把“上半年居民收入实际增长4.2%，低于GDP的4.7%”一句改为“收入与GDP大体同步，但中位数仍明显低于平均数”。\n【口径】中位数增速为名义值；均值与中位数之差不能直接换算不平等程度；住户调查季度数据不含自产自用部分。\n【衔接】收入稳不稳，首先取决于工作稳不稳。" });
-    chartCap(s, "2026年上半年人均可支配收入（元）", MX, 1.58, 4.4);
-    s.addChart(pres.charts.BAR, [{ name: "收入", labels: ["平均数", "中位数"], values: [D.incH1, D.medH1] }], co({
+      `【时长】2分钟\n【讲法】平均数会“被拉高”。前三季度全国居民人均可支配收入${X(Q.inc, 0)}元，中位数${X(Q.med, 0)}元，是平均数的${Q.inc && Q.med ? (Q.med / Q.inc * 100).toFixed(0) : "××"}%（${Q.est ? "预估；" : ""}去年同期83.5%）——一半以上的人达不到平均数。中位数名义增长${X(Q.medG)}%，平均数${X(Q.incG)}%。\n右图对比收入和GDP的实际增速。2019年以来大体同步；今年前三季度居民收入实际增长${X(Q.incReal)}%，GDP增长${X(Q.gdp)}%。财产净收入增长${X(Q.propG)}%。\n所以“数据在增长、感觉没增长”有它的道理：多数家庭的感受，取决于中位数，和自己那份收入稳不稳。\n${Q.est ? "【预估说明】前三季度收入按上半年增速外推（金额＝去年前三季度×（1＋上半年增速））。上半年实际：平均数22981元，中位数19036元（为平均数的83%）；中位数名义增长4.7%，低于平均数的5.2%；居民收入实际增长4.2%，低于GDP的4.7%；财产净收入只增长1.1%；农村居民收入增长6.4%，快于城镇的4.4%。19日换成发布值；若前三季度居民收入实际增速不低于GDP，讲“收入与GDP大体同步，但中位数仍明显低于平均数”；若财产净收入增长明显加快，删去页面底部“资产端加分有限”。\n" : ""}【口径】中位数增速为名义值；均值与中位数之差不能直接换算不平等程度；住户调查季度数据不含自产自用部分。\n【衔接】收入稳不稳，首先取决于工作稳不稳。` });
+    chartCap(s, `2026年前三季度人均可支配收入（元${Q.est ? "，预估" : ""}）`, MX, 1.58, 4.4);
+    if (Q.inc == null || Q.med == null) ph(s, MX, 1.95, 4.4, 3.5, "平均数与中位数⏎10月19日发布后填入⏎⏎上年同期：中位数为平均数的83.5%");
+    else s.addChart(pres.charts.BAR, [{ name: "收入", labels: ["平均数", "中位数"], values: [Q.inc, Q.med] }], co({
       x: MX, y: 1.95, w: 4.4, h: 3.5, barDir: "col", chartColors: [COL.BLUE_L, COL.R], showValue: true, dataLabelFormatCode: "#,##0", dataLabelFontSize: 15,
-      valAxisMinVal: 0, valAxisMaxVal: 26000, valAxisHidden: true, valGridLine: { style: "none" }, barGapWidthPct: 60, catAxisLabelFontSize: 15,
+      valAxisMinVal: 0, valAxisMaxVal: Math.ceil((Q.inc * 1.15) / 2000) * 2000, valAxisHidden: true, valGridLine: { style: "none" }, barGapWidthPct: 60, catAxisLabelFontSize: 15,
     }));
-    T(s, "名义增长：平均数5.2%，中位数4.7%", { x: MX, y: 5.45, w: 4.4, h: 0.4, fontSize: 15, color: COL.GRAY, align: "center" });
+    T(s, `名义增长：平均数${X(Q.incG)}%，中位数${X(Q.medG)}%`, { x: MX, y: 5.45, w: 4.4, h: 0.4, fontSize: 15, color: COL.GRAY, align: "center" });
     const x2 = MX + 4.9, w2 = CW - 4.9;
-    chartCap(s, "居民人均可支配收入与GDP实际增速（%）", x2, 1.58, w2);
+    chartCap(s, `居民人均可支配收入与GDP实际增速（%${Q.est ? "；2026年为预估值" : ""}）`, x2, 1.58, w2);
     s.addChart(pres.charts.LINE, [
-      { name: "GDP", labels: yl(D.gdpYears), values: D.gdpReal },
-      { name: "居民收入", labels: yl(D.gdpYears), values: D.incGrowthReal },
+      { name: "GDP", labels: yl(D.gdpYears), values: last(D.gdpReal, Q.gdp) },
+      { name: "居民收入", labels: yl(D.gdpYears), values: last(D.incGrowthReal, Q.incReal) },
     ], co({ x: x2, y: 1.95, w: w2, h: 3.9, chartColors: [COL.GRAY_L, COL.R], lineSize: 3, lineDataSymbol: "circle", lineDataSymbolSize: 7, showLegend: true, legendPos: "t", showValue: false,
       valAxisMinVal: 0, valAxisMaxVal: 10, valAxisMajorUnit: 2, catAxisLabelFontSize: 12 }));
-    take(s, "多数家庭的感受取决于**中位数**和**收入稳不稳**；上半年财产净收入仅增长1.1%，资产端也没有“加分”。", { y: 6.12, h: 0.66, size: 18 });
-    src(s, "资料来源：国家统计局住户调查与国民经济核算。2026年上半年居民收入实际增长4.2%，GDP增长4.7%。");
+    take(s, `多数家庭的感受取决于**中位数**和**收入稳不稳**；前三季度财产净收入增长${X(Q.propG)}%，资产端“加分”有限。`, { y: 6.12, h: 0.66, size: 18 });
+    src(s, `资料来源：国家统计局住户调查与国民经济核算。2026年前三季度居民收入实际增长${X(Q.incReal)}%，GDP增长${X(Q.gdp)}%${E}。`);
   }
 
   // ---------- P20 就业 ----------
@@ -221,18 +233,18 @@ module.exports = async function ({ L, D }) {
   // ---------- P23 房地产 ----------
   {
     const s = page(3, "房地产仍在调整：新房销售面积不到2021年的一半", { min: 2, key: "p_house", notes:
-      "【时长】2分钟\n【讲法】新建商品房销售面积2021年接近18亿平方米，2025年降到8.8亿平方米，不到高点的一半；今年1—8月又下降12.1%。二手房成交在增长，1—8月网签面积增长10.6%——交易在从新房向二手房转移。\n价格方面，看浙江的三个70城样本城市：8月杭州新房同比上涨2.2%，二手房下降3.5%；宁波新房降0.8%、二手房降2.7%；温州新房降3.8%、二手房降5.3%。同一城市，新房和二手房走势也不一样。\n房子是中国家庭最大的资产。房价预期不稳，影响的不只是开发商：家庭的“财富感”、换房链条、装修家居家电，都会受影响（机制见第34页）。\n【口径】销售面积为商品房；房价为70城住宅价格指数，上年同月=100；三市不代表全省；不能用销售额除以面积冒充同质房价。\n【补充】1—8月房地产开发投资按可比口径下降19.9%，全国固定资产投资下降7.2%，其中民间投资下降10.1%。\n【衔接】另一类资产——股票——变化如何？" });
+      `【时长】2分钟\n【讲法】新建商品房销售面积2021年接近18亿平方米，2025年降到8.8亿平方米，不到高点的一半；今年1—9月${X(Q.newSalesAreaYTD, 1, true)}%${E}（1—8月实际-12.1%）。二手房成交在增长，1—8月网签面积增长10.6%——交易在从新房向二手房转移。\n价格方面，看浙江的三个70城样本城市（9月数据19日发布，表中暂按8月实际值）：杭州新房同比上涨2.2%，二手房下降3.5%；宁波新房降0.8%、二手房降2.7%；温州新房降3.8%、二手房降5.3%。同一城市，新房和二手房走势也不一样。\n房子是中国家庭最大的资产。房价预期不稳，影响的不只是开发商：家庭的“财富感”、换房链条、装修家居家电，都会受影响（机制见第34页）。\n【口径】销售面积为商品房；房价为70城住宅价格指数，上年同月=100；三市不代表全省；不能用销售额除以面积冒充同质房价。\n【补充】1—8月房地产开发投资按可比口径下降19.9%，全国固定资产投资下降7.2%，其中民间投资下降10.1%。\n【衔接】另一类资产——股票——变化如何？` });
     chartCap(s, "全国新建商品房销售面积（亿平方米）", MX, 1.58, 6.9);
     s.addChart(pres.charts.BAR, [{ name: "销售面积", labels: D.houseYears, values: D.houseArea }], co({
       x: MX, y: 1.95, w: 6.9, h: 4.0, barDir: "col", chartColors: D.houseArea.map((v, i) => (i === 2 ? COL.BLUE : (i === D.houseArea.length - 1 ? COL.R : COL.BLUE_L))), showValue: true, dataLabelFormatCode: "0.0",
       valAxisMinVal: 0, valAxisMaxVal: 20, valAxisHidden: true, valGridLine: { style: "none" }, barGapWidthPct: 45,
     }));
     const px = 7.85, pw = CW - (px - MX);
-    T(s, "2026年1—8月：新房销售面积 -12.1%，二手房网签面积 +10.6%", { x: px, y: 1.6, w: pw, h: 0.75, fontSize: 16, bold: true, lineSpacingMultiple: 1.05 });
-    T(s, "8月住宅价格同比（%）", { x: px, y: 2.5, w: pw, h: 0.36, fontSize: 15, bold: true, color: COL.GRAY });
+    T(s, `1—9月新房销售面积 ${X(Q.newSalesAreaYTD, 1, true)}%${E}⏎1—8月二手房网签面积 +10.6%`, { x: px, y: 1.6, w: pw, h: 0.75, fontSize: 16, bold: true, lineSpacingMultiple: 1.05 });
+    T(s, `9月住宅价格同比（%${Q.est ? "；预估：暂按8月实际值" : ""}）`, { x: px, y: 2.5, w: pw, h: 0.36, fontSize: 15, bold: true, color: COL.GRAY });
     table(s, [
       ["城市", "新房", "二手房"],
-      ...D.city70.map((r) => [r[0], (r[1] > 0 ? "+" : "") + r[1].toFixed(1), r[2].toFixed(1)]),
+      ...Q.city70.map((r) => [r[0], X(r[1], 1, true), X(r[2], 1, true)]),
     ], { x: px, y: 2.9, w: pw, colW: [pw * 0.34, pw * 0.33, pw * 0.33], rowH: 0.45, size: 16, align: ["left", "right", "right"] });
     T(s, "三市为70城样本，不代表全省", { x: px, y: 4.85, w: pw, h: 0.35, fontSize: 13, color: COL.GRAY });
     take(s, "房子是中国家庭最大的资产：价格预期不稳，家庭的**“财富感”**和**换房链条**都受影响（机制见第34页）。", { y: 6.12, h: 0.66, size: 18 });
